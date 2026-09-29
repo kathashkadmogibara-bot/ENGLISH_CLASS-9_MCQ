@@ -95,7 +95,7 @@ footer b{color:var(--text);letter-spacing:.5px}
 
   <!-- ============ SETUP ============ -->
   <div id="setupZone" class="card setup">
-    <h2>Test setup karo</h2>
+    <h2>Test Setup</h2>
     <div class="field">
       <label>Difficulty</label>
       <select id="levelSel">
@@ -106,7 +106,7 @@ footer b{color:var(--text);letter-spacing:.5px}
       </select>
     </div>
     <div class="field">
-      <label>Kitne questions?</label>
+      <label>Number of questions</label>
       <input type="number" id="numQ" min="1" value="5">
       <div class="hint" id="availHint"></div>
     </div>
@@ -154,9 +154,9 @@ footer b{color:var(--text);letter-spacing:.5px}
         <div style="color:var(--muted);margin-top:6px" id="verdict"></div>
         <div class="stats" id="stats"></div>
       </div>
-      <h3>Galat / Unanswered questions</h3>
+      <h3>Incorrect / Unanswered Questions</h3>
       <div id="wrongList"></div>
-      <div class="actions"><button class="btn primary" id="againBtn">Naya Test</button></div>
+      <div class="actions"><button class="btn primary" id="againBtn">New Test</button></div>
     </div>
   </div>
 
@@ -167,12 +167,12 @@ footer b{color:var(--text);letter-spacing:.5px}
 </footer>
 
 <!-- =====================================================================
-     MCQ BANK  (yahan apne questions add karo)
+     MCQ BANK  (add your questions here)
 
-     Ek MCQ ka format — bas ye block copy karke neeche paste karo:
+     Format of one MCQ - just copy this block and paste it below:
 
      <div class="q" data-level="easy" data-answer="2">
-       <p>Question yahan likho?</p>
+       <p>Write your question here?</p>
        <ul>
          <li>Option 1</li>
          <li>Option 2</li>
@@ -181,9 +181,9 @@ footer b{color:var(--text);letter-spacing:.5px}
        </ul>
      </div>
 
-     data-level  = easy  ya  medium  ya  hard
-     data-answer = sahi option ka number (1, 2, 3 ya 4)
-     Options 2 se 6 tak kitne bhi ho sakte hain.
+     data-level  = easy  or  medium  or  hard
+     data-answer = number of the correct option (1, 2, 3 or 4)
+     You can have anywhere from 2 to 6 options.
      ===================================================================== -->
 <section id="bank">
 
@@ -296,7 +296,7 @@ function available(){
 }
 function updateHint(){
   const n = available().length;
-  $('availHint').textContent = `Is difficulty me ${n} questions available hain.`;
+  $('availHint').textContent = `${n} questions available in this difficulty.`;
   $('numQ').max = n;
   if (+$('numQ').value > n) $('numQ').value = n || 1;
 }
@@ -316,10 +316,10 @@ $('startBtn').onclick = () => {
   const pool = available();
   const n = parseInt($('numQ').value, 10);
   const m = parseFloat($('mins').value);
-  if (!pool.length) return $('setupMsg').textContent = 'Is difficulty me koi question nahi hai.';
-  if (!n || n < 1) return $('setupMsg').textContent = 'Questions ki sahi sankhya daalo.';
-  if (n > pool.length) return $('setupMsg').textContent = `Maximum ${pool.length} questions hi hain.`;
-  if (!m || m <= 0) return $('setupMsg').textContent = 'Time sahi daalo.';
+  if (!pool.length) return $('setupMsg').textContent = 'No questions available for this difficulty.';
+  if (!n || n < 1) return $('setupMsg').textContent = 'Enter a valid number of questions.';
+  if (n > pool.length) return $('setupMsg').textContent = `Only ${pool.length} questions are available.`;
+  if (!m || m <= 0) return $('setupMsg').textContent = 'Enter a valid time.';
   $('setupMsg').textContent = '';
 
   quiz = shuffle(pool).slice(0, n).map(b => {
@@ -396,12 +396,12 @@ function updateGrid(){
 /* ---------- Buttons ---------- */
 function goNext(){
   if (idx < quiz.length - 1){ idx++; render(); }
-  else { updateGrid(); $('quizMsg').style.color = 'var(--muted)'; $('quizMsg').textContent = 'Ye last question tha. Submit Quiz dabao ya kisi bhi question par wapas jao.'; }
+  else { updateGrid(); $('quizMsg').style.color = 'var(--muted)'; $('quizMsg').textContent = 'This was the last question. Click Submit Quiz or go back to any question.'; }
 }
 $('saveBtn').onclick = () => {
   if (picked[idx] === null){
     $('quizMsg').style.color = 'var(--red)';
-    return $('quizMsg').textContent = 'Pehle koi option chuno, phir Save karo.';
+    return $('quizMsg').textContent = 'Please select an option before saving.';
   }
   status[idx] = 'saved';
   goNext();
@@ -414,7 +414,7 @@ $('skipBtn').onclick = () => {
 $('prevBtn').onclick = () => { if (idx > 0){ idx--; render(); } };
 $('submitBtn').onclick = () => {
   const left = status.filter(s => s !== 'saved').length;
-  const ok = left === 0 || confirm(`${left} question(s) saved nahi hain. Fir bhi submit karna hai?`);
+  const ok = left === 0 || confirm(`${left} question(s) are not saved. Submit anyway?`);
   if (ok) finish();
 };
 
@@ -439,17 +439,17 @@ function finish(){
   const pctTxt = (Math.round(pct * 10) / 10) + '%';
   $('pct').textContent = pctTxt;
   $('pct').style.color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--orange)' : 'var(--red)';
-  $('verdict').textContent = pct >= 70 ? 'Bahut badhiya! 🎉' : pct >= 40 ? 'Theek hai, aur practice karo 💪' : 'Aur mehnat chahiye 📚';
+  $('verdict').textContent = pct >= 70 ? 'Great job! 🎉' : pct >= 40 ? 'Good, keep practicing 💪' : 'Needs more practice 📚';
   $('stats').innerHTML = `
-    <div class="stat" style="color:var(--green)">✔ Sahi: ${correct}</div>
-    <div class="stat" style="color:var(--red)">✘ Galat: ${wrongCount}</div>
+    <div class="stat" style="color:var(--green)">✔ Correct: ${correct}</div>
+    <div class="stat" style="color:var(--red)">✘ Incorrect: ${wrongCount}</div>
     <div class="stat">⏭ Unanswered: ${skipped}</div>
     <div class="stat">Total: ${quiz.length}</div>`;
 
   const list = $('wrongList');
   list.innerHTML = '';
   if (!wrongs.length){
-    list.innerHTML = '<div class="perfect">Koi galti nahi! Perfect score 🏆</div>';
+    list.innerHTML = '<div class="perfect">No mistakes! Perfect score 🏆</div>';
     return;
   }
   wrongs.forEach(({ q, i, answered }) => {
@@ -457,8 +457,8 @@ function finish(){
     d.className = 'wrong';
     d.innerHTML = `
       <div class="q">Q${i + 1}. ${q.q} <span class="tag ${q.level}" style="margin-left:6px">${q.level}</span></div>
-      <div class="pick">Aapka jawab: ${answered ? LETTERS[picked[i]] + '. ' + q.opts[picked[i]] : 'Answer nahi diya'}</div>
-      <div class="right">Sahi jawab: ${LETTERS[q.ans]}. ${q.opts[q.ans]}</div>`;
+      <div class="pick">Your answer: ${answered ? LETTERS[picked[i]] + '. ' + q.opts[picked[i]] : 'Not answered'}</div>
+      <div class="right">Correct answer: ${LETTERS[q.ans]}. ${q.opts[q.ans]}</div>`;
     list.appendChild(d);
   });
 }
