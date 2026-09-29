@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCQ Practice</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --text:#1c2333; --muted:#6b7590; --border:#dde2ee;
+  --accent:#4f6ef7; --accent-text:#fff;
+  --green:#22a06b; --red:#e5484d; --gray:#c9cfdd; --orange:#f59f00;
+  --easy:#22a06b; --medium:#f59f00; --hard:#e5484d;
+}
+body.dark{
+  --bg:#0f1420; --card:#181f2f; --text:#e8ecf7; --muted:#8e99b5; --border:#2a3348;
+  --accent:#6f8bff; --accent-text:#0f1420; --gray:#3a4460;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--border)}
+header h1{font-size:18px;margin:0}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:10px 16px;border-radius:10px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.btn.green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.red{background:var(--red);color:#fff;border-color:var(--red)}
+.wrap{max-width:1100px;margin:20px auto;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}
+.hidden{display:none !important}
+
+/* Setup */
+.setup{max-width:480px;margin:40px auto}
+.setup h2{margin-top:0}
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:600;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font:inherit}
+.hint{color:var(--muted);font-size:13px;margin-top:4px}
+
+/* Quiz layout */
+.quiz{display:grid;grid-template-columns:1fr 260px;gap:16px}
+@media(max-width:800px){.quiz{grid-template-columns:1fr}}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:20px;padding:6px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--border)}
+.timer.low{color:var(--red);border-color:var(--red)}
+.tag{display:inline-block;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.4px}
+.tag.easy{background:var(--easy)} .tag.medium{background:var(--medium)} .tag.hard{background:var(--hard)}
+.qno{color:var(--muted);font-weight:600;margin-right:8px}
+.qtext{font-size:19px;line-height:1.5;margin:14px 0 18px}
+.opt{display:flex;gap:12px;align-items:center;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.opt .k{width:28px;height:28px;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.opt.sel .k{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.msg{color:var(--red);font-size:14px;min-height:20px;margin-top:8px}
+
+/* Sidebar */
+.side h3{margin:0 0 12px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.sq{aspect-ratio:1;border-radius:8px;border:2px solid transparent;background:var(--gray);color:#fff;font-weight:700;font-size:14px}
+.sq.saved{background:var(--green)}
+.sq.skipped{background:var(--red)}
+.sq.current{border-color:var(--text);box-shadow:0 0 0 2px var(--accent)}
+.legend{margin-top:14px;font-size:13px;color:var(--muted);display:grid;gap:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+/* Result */
+.score{text-align:center;padding:10px 0 20px}
+.big{font-size:64px;font-weight:800;line-height:1}
+.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.stat{padding:10px 18px;border-radius:12px;background:var(--bg);border:1px solid var(--border);font-weight:600}
+.wrong{border:1px solid var(--border);border-left:5px solid var(--red);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.wrong .q{font-weight:600;margin-bottom:8px}
+.pick{color:var(--red)} .right{color:var(--green)}
+.perfect{text-align:center;color:var(--green);font-weight:700;padding:20px}
+
+/* Question bank is never shown */
+#bank{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📝 MCQ Practice</h1>
+  <button class="btn" id="themeBtn">🌙 Dark</button>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ SETUP ============ -->
+  <div id="setupZone" class="card setup">
+    <h2>Test setup karo</h2>
+    <div class="field">
+      <label>Difficulty</label>
+      <select id="levelSel">
+        <option value="all">All (Mix)</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Kitne questions?</label>
+      <input type="number" id="numQ" min="1" value="5">
+      <div class="hint" id="availHint"></div>
+    </div>
+    <div class="field">
+      <label>Time (minutes)</label>
+      <input type="number" id="mins" min="1" value="5">
+    </div>
+    <button class="btn primary" style="width:100%" id="startBtn">Start Test</button>
+    <div class="msg" id="setupMsg"></div>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div id="quizZone" class="quiz hidden">
+    <div class="card">
+      <div class="topbar">
+        <div><span class="qno" id="qNo"></span><span class="tag" id="qTag"></span></div>
+        <div class="timer" id="timer">00:00</div>
+      </div>
+      <div class="qtext" id="qText"></div>
+      <div id="opts"></div>
+      <div class="msg" id="quizMsg"></div>
+      <div class="actions">
+        <button class="btn" id="prevBtn">← Previous</button>
+        <button class="btn green" id="saveBtn">Save &amp; Next</button>
+        <button class="btn red" id="skipBtn">Skip</button>
+        <button class="btn primary" id="submitBtn" style="margin-left:auto">Submit Quiz</button>
+      </div>
+    </div>
+    <div class="card side">
+      <h3>Questions</h3>
+      <div class="grid" id="grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--gray)"></i>Not visited / not saved</span>
+        <span><i style="background:var(--green)"></i>Saved</span>
+        <span><i style="background:var(--red)"></i>Skipped</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RESULT ============ -->
+  <div id="resultZone" class="hidden">
+    <div class="card">
+      <div class="score">
+        <div class="big" id="pct"></div>
+        <div style="color:var(--muted);margin-top:6px" id="verdict"></div>
+        <div class="stats" id="stats"></div>
+      </div>
+      <h3>Galat / Unanswered questions</h3>
+      <div id="wrongList"></div>
+      <div class="actions"><button class="btn primary" id="againBtn">Naya Test</button></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- =====================================================================
+     MCQ BANK  (yahan apne questions add karo)
+
+     Ek MCQ ka format — bas ye block copy karke neeche paste karo:
+
+     <div class="q" data-level="easy" data-answer="2">
+       <p>Question yahan likho?</p>
+       <ul>
+         <li>Option 1</li>
+         <li>Option 2</li>
+         <li>Option 3</li>
+         <li>Option 4</li>
+       </ul>
+     </div>
+
+     data-level  = easy  ya  medium  ya  hard
+     data-answer = sahi option ka number (1, 2, 3 ya 4)
+     Options 2 se 6 tak kitne bhi ho sakte hain.
+     ===================================================================== -->
+<section id="bank">
+
+  <!-- ---------- EASY ---------- -->
+  <div class="q" data-level="easy" data-answer="3">
+    <p>India ki rajdhani kya hai?</p>
+    <ul><li>Mumbai</li><li>Kolkata</li><li>New Delhi</li><li>Chennai</li></ul>
+  </div>
+
+  <div class="q" data-level="easy" data-answer="2">
+    <p>HTML ka full form kya hai?</p>
+    <ul><li>Hyper Tool Markup Language</li><li>HyperText Markup Language</li><li>High Text Machine Language</li><li>Home Text Markup Level</li></ul>
+  </div>
+
+  <div class="q" data-level="easy" data-answer="1">
+    <p>5 + 7 = ?</p>
+    <ul><li>12</li><li>11</li><li>13</li><li>10</li></ul>
+  </div>
+
+  <!-- ---------- MEDIUM ---------- -->
+  <div class="q" data-level="medium" data-answer="4">
+    <p>CSS me text ka color badalne ki property kaun si hai?</p>
+    <ul><li>font-color</li><li>text-style</li><li>bgcolor</li><li>color</li></ul>
+  </div>
+
+  <div class="q" data-level="medium" data-answer="2">
+    <p>JavaScript me array ke end me element add karne ka method kaun sa hai?</p>
+    <ul><li>pop()</li><li>push()</li><li>shift()</li><li>slice()</li></ul>
+  </div>
+
+  <div class="q" data-level="medium" data-answer="1">
+    <p>Bharat ka samvidhan kab lagu hua?</p>
+    <ul><li>26 January 1950</li><li>15 August 1947</li><li>26 November 1949</li><li>2 October 1950</li></ul>
+  </div>
+
+  <!-- ---------- HARD ---------- -->
+  <div class="q" data-level="hard" data-answer="3">
+    <p>JavaScript me <code>typeof null</code> ka result kya aata hai?</p>
+    <ul><li>"null"</li><li>"undefined"</li><li>"object"</li><li>"number"</li></ul>
+  </div>
+
+  <div class="q" data-level="hard" data-answer="2">
+    <p>Binary search ki time complexity kya hoti hai (sorted array par)?</p>
+    <ul><li>O(n)</li><li>O(log n)</li><li>O(n log n)</li><li>O(1)</li></ul>
+  </div>
+
+  <div class="q" data-level="hard" data-answer="4">
+    <p>CSS me kaun sa <code>position</code> value element ko normal flow se hata kar nearest positioned ancestor ke hisab se place karta hai?</p>
+    <ul><li>static</li><li>relative</li><li>sticky</li><li>absolute</li></ul>
+  </div>
+
+</section>
+
+<script>
+/* ---------- Read the MCQ bank from HTML ---------- */
+const bank = [...document.querySelectorAll('#bank .q')].map(el => ({
+  level: (el.dataset.level || 'easy').toLowerCase().trim(),
+  q: el.querySelector('p').innerHTML,
+  opts: [...el.querySelectorAll('li')].map(li => li.innerHTML),
+  ans: parseInt(el.dataset.answer, 10) - 1
+}));
+
+const $ = id => document.getElementById(id);
+const LETTERS = 'ABCDEF';
+let quiz = [], idx = 0, status = [], picked = [], timeLeft = 0, timerId = null;
+
+/* ---------- Theme ---------- */
+$('themeBtn').onclick = () => {
+  document.body.classList.toggle('dark');
+  $('themeBtn').textContent = document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
+};
+
+/* ---------- Setup ---------- */
+function available(){
+  const lv = $('levelSel').value;
+  return bank.filter(b => lv === 'all' || b.level === lv);
+}
+function updateHint(){
+  const n = available().length;
+  $('availHint').textContent = `Is difficulty me ${n} questions available hain.`;
+  $('numQ').max = n;
+  if (+$('numQ').value > n) $('numQ').value = n || 1;
+}
+$('levelSel').onchange = updateHint;
+updateHint();
+
+function shuffle(a){
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+$('startBtn').onclick = () => {
+  const pool = available();
+  const n = parseInt($('numQ').value, 10);
+  const m = parseFloat($('mins').value);
+  if (!pool.length) return $('setupMsg').textContent = 'Is difficulty me koi question nahi hai.';
+  if (!n || n < 1) return $('setupMsg').textContent = 'Questions ki sahi sankhya daalo.';
+  if (n > pool.length) return $('setupMsg').textContent = `Maximum ${pool.length} questions hi hain.`;
+  if (!m || m <= 0) return $('setupMsg').textContent = 'Time sahi daalo.';
+  $('setupMsg').textContent = '';
+
+  quiz = shuffle(pool).slice(0, n);
+  status = quiz.map(() => 'none');
+  picked = quiz.map(() => null);
+  idx = 0;
+  timeLeft = Math.round(m * 60);
+
+  $('setupZone').classList.add('hidden');
+  $('resultZone').classList.add('hidden');
+  $('quizZone').classList.remove('hidden');
+  buildGrid();
+  render();
+  tick();
+  clearInterval(timerId);
+  timerId = setInterval(tick, 1000);
+};
+
+/* ---------- Timer ---------- */
+function tick(){
+  const mm = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const ss = String(timeLeft % 60).padStart(2, '0');
+  $('timer').textContent = `${mm}:${ss}`;
+  $('timer').classList.toggle('low', timeLeft <= 30);
+  if (timeLeft <= 0){ finish(); return; }
+  timeLeft--;
+}
+
+/* ---------- Render question ---------- */
+function render(){
+  const cur = quiz[idx];
+  $('qNo').textContent = `Q ${idx + 1} / ${quiz.length}`;
+  const tag = $('qTag');
+  tag.textContent = cur.level;
+  tag.className = 'tag ' + cur.level;
+  $('qText').innerHTML = cur.q;
+  $('quizMsg').textContent = '';
+
+  const box = $('opts');
+  box.innerHTML = '';
+  cur.opts.forEach((o, i) => {
+    const d = document.createElement('div');
+    d.className = 'opt' + (picked[idx] === i ? ' sel' : '');
+    d.innerHTML = `<span class="k">${LETTERS[i]}</span><span>${o}</span>`;
+    d.onclick = () => { picked[idx] = i; render(); };
+    box.appendChild(d);
+  });
+
+  $('prevBtn').disabled = idx === 0;
+  $('saveBtn').textContent = idx === quiz.length - 1 ? 'Save' : 'Save & Next';
+  updateGrid();
+}
+
+function buildGrid(){
+  const g = $('grid');
+  g.innerHTML = '';
+  quiz.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'sq';
+    b.textContent = i + 1;
+    b.onclick = () => { idx = i; render(); };
+    g.appendChild(b);
+  });
+}
+function updateGrid(){
+  [...$('grid').children].forEach((b, i) => {
+    b.className = 'sq' + (status[i] === 'saved' ? ' saved' : status[i] === 'skipped' ? ' skipped' : '') + (i === idx ? ' current' : '');
+  });
+}
+
+/* ---------- Buttons ---------- */
+function goNext(){
+  if (idx < quiz.length - 1){ idx++; render(); }
+  else { updateGrid(); $('quizMsg').style.color = 'var(--muted)'; $('quizMsg').textContent = 'Ye last question tha. Submit Quiz dabao ya kisi bhi question par wapas jao.'; }
+}
+$('saveBtn').onclick = () => {
+  if (picked[idx] === null){
+    $('quizMsg').style.color = 'var(--red)';
+    return $('quizMsg').textContent = 'Pehle koi option chuno, phir Save karo.';
+  }
+  status[idx] = 'saved';
+  goNext();
+};
+$('skipBtn').onclick = () => {
+  picked[idx] = null;
+  status[idx] = 'skipped';
+  goNext();
+};
+$('prevBtn').onclick = () => { if (idx > 0){ idx--; render(); } };
+$('submitBtn').onclick = () => {
+  const left = status.filter(s => s !== 'saved').length;
+  const ok = left === 0 || confirm(`${left} question(s) saved nahi hain. Fir bhi submit karna hai?`);
+  if (ok) finish();
+};
+
+/* ---------- Result ---------- */
+function finish(){
+  clearInterval(timerId);
+  $('quizZone').classList.add('hidden');
+  $('resultZone').classList.remove('hidden');
+
+  let correct = 0, skipped = 0, wrongCount = 0;
+  const wrongs = [];
+  quiz.forEach((q, i) => {
+    const answered = status[i] === 'saved' && picked[i] !== null;
+    if (answered && picked[i] === q.ans) correct++;
+    else {
+      if (answered) wrongCount++; else skipped++;
+      wrongs.push({ q, i, answered });
+    }
+  });
+
+  const pct = quiz.length ? (correct / quiz.length) * 100 : 0;
+  const pctTxt = (Math.round(pct * 10) / 10) + '%';
+  $('pct').textContent = pctTxt;
+  $('pct').style.color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--orange)' : 'var(--red)';
+  $('verdict').textContent = pct >= 70 ? 'Bahut badhiya! 🎉' : pct >= 40 ? 'Theek hai, aur practice karo 💪' : 'Aur mehnat chahiye 📚';
+  $('stats').innerHTML = `
+    <div class="stat" style="color:var(--green)">✔ Sahi: ${correct}</div>
+    <div class="stat" style="color:var(--red)">✘ Galat: ${wrongCount}</div>
+    <div class="stat">⏭ Unanswered: ${skipped}</div>
+    <div class="stat">Total: ${quiz.length}</div>`;
+
+  const list = $('wrongList');
+  list.innerHTML = '';
+  if (!wrongs.length){
+    list.innerHTML = '<div class="perfect">Koi galti nahi! Perfect score 🏆</div>';
+    return;
+  }
+  wrongs.forEach(({ q, i, answered }) => {
+    const d = document.createElement('div');
+    d.className = 'wrong';
+    d.innerHTML = `
+      <div class="q">Q${i + 1}. ${q.q} <span class="tag ${q.level}" style="margin-left:6px">${q.level}</span></div>
+      <div class="pick">Aapka jawab: ${answered ? LETTERS[picked[i]] + '. ' + q.opts[picked[i]] : 'Answer nahi diya'}</div>
+      <div class="right">Sahi jawab: ${LETTERS[q.ans]}. ${q.opts[q.ans]}</div>`;
+    list.appendChild(d);
+  });
+}
+
+$('againBtn').onclick = () => {
+  $('resultZone').classList.add('hidden');
+  $('setupZone').classList.remove('hidden');
+};
+</script>
+</body>
+</html>
