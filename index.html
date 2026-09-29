@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MCQ Practice</title>
+<title>Mogibara MCQ Practice</title>
 <style>
 :root{
   --bg:#f4f6fb; --card:#ffffff; --text:#1c2333; --muted:#6b7590; --border:#dde2ee;
@@ -76,6 +76,10 @@ button{font:inherit;cursor:pointer}
 .pick{color:var(--red)} .right{color:var(--green)}
 .perfect{text-align:center;color:var(--green);font-weight:700;padding:20px}
 
+/* Footer */
+footer{text-align:center;color:var(--muted);font-size:14px;padding:24px 16px 32px}
+footer b{color:var(--text);letter-spacing:.5px}
+
 /* Question bank is never shown */
 #bank{display:none}
 </style>
@@ -83,7 +87,7 @@ button{font:inherit;cursor:pointer}
 <body>
 
 <header>
-  <h1>📝 MCQ Practice</h1>
+  <h1>📝 Mogibara MCQ Practice</h1>
   <button class="btn" id="themeBtn">🌙 Dark</button>
 </header>
 
@@ -158,6 +162,10 @@ button{font:inherit;cursor:pointer}
 
 </div>
 
+<footer>
+  © <span id="yr">2026</span> <b>MOGIBARA</b>. All rights reserved.
+</footer>
+
 <!-- =====================================================================
      MCQ BANK  (yahan apne questions add karo)
 
@@ -180,51 +188,83 @@ button{font:inherit;cursor:pointer}
 <section id="bank">
 
   <!-- ---------- EASY ---------- -->
-  <div class="q" data-level="easy" data-answer="3">
-    <p>India ki rajdhani kya hai?</p>
-    <ul><li>Mumbai</li><li>Kolkata</li><li>New Delhi</li><li>Chennai</li></ul>
+  <div class="q" data-level="easy" data-answer="2">
+    <p>What was the exact headline date recorded at the top of the diary entry?</p>
+    <ul><li>15 March 2157</li><li>17 May 2157</li><li>17 May 2057</li><li>12 April 2155</li></ul>
   </div>
 
   <div class="q" data-level="easy" data-answer="2">
-    <p>HTML ka full form kya hai?</p>
-    <ul><li>Hyper Tool Markup Language</li><li>HyperText Markup Language</li><li>High Text Machine Language</li><li>Home Text Markup Level</li></ul>
+    <p>What is the exact age of the young girl who kept the diary?</p>
+    <ul><li>Nine years old</li><li>Eleven years old</li><li>Thirteen years old</li><li>Fifteen years old</li></ul>
   </div>
 
-  <div class="q" data-level="easy" data-answer="1">
-    <p>5 + 7 = ?</p>
-    <ul><li>12</li><li>11</li><li>13</li><li>10</li></ul>
+  <div class="q" data-level="easy" data-answer="2">
+    <p>What strange object did the older boy find in the attic of his house?</p>
+    <ul><li>A functional mechanical teacher</li><li>A real book with yellow, crinkly pages</li><li>An antique tele-screen console</li><li>A punch code notebook</li></ul>
   </div>
+
+  <div class="q" data-level="easy" data-answer="2">
+    <p>At what age was the young girl's hearing impairment first noticed by her mother?</p>
+    <ul><li>Five years old</li><li>Subjectively at eight years old</li><li>Eleven years old</li><li>Sixteen years old</li></ul>
+  </div>
+
+  <div class="q" data-level="easy" data-answer="3">
+    <p>Which historical ruler ordered a complete ban on playing the musical instrument named 'Pungi' in the royal residence?</p>
+    <ul><li>Emperor Akbar</li><li>Emperor Shah Jahan</li><li>Emperor Aurangzeb</li><li>Emperor Babur</li></ul>
+  </div>
+
+  <div class="q" data-level="easy" data-answer="2">
+    <p>For what exact sum of money did Grandfather purchase the mischievous pet monkey from the local driver?</p>
+    <ul><li>Three rupees</li><li>Five rupees</li><li>Seven rupees</li><li>Ten rupees</li></ul>
+  </div>
+
 
   <!-- ---------- MEDIUM ---------- -->
-  <div class="q" data-level="medium" data-answer="4">
-    <p>CSS me text ka color badalne ki property kaun si hai?</p>
-    <ul><li>font-color</li><li>text-style</li><li>bgcolor</li><li>color</li></ul>
+  <div class="q" data-level="medium" data-answer="2">
+    <p>Which specific subject sector of the mechanical teacher had developed an operational velocity fault, causing repeated failures?</p>
+    <ul><li>History sector</li><li>Geography sector</li><li>Mathematics track</li><li>General Science sector</li></ul>
   </div>
 
   <div class="q" data-level="medium" data-answer="2">
-    <p>JavaScript me array ke end me element add karne ka method kaun sa hai?</p>
-    <ul><li>pop()</li><li>push()</li><li>shift()</li><li>slice()</li></ul>
+    <p>At what age was the girl's absolute hearing loss officially confirmed by a qualified specialist?</p>
+    <ul><li>8 years old</li><li>11 years old</li><li>15 years old</li><li>17 years old</li></ul>
   </div>
 
-  <div class="q" data-level="medium" data-answer="1">
-    <p>Bharat ka samvidhan kab lagu hua?</p>
-    <ul><li>26 January 1950</li><li>15 August 1947</li><li>26 November 1949</li><li>2 October 1950</li></ul>
+  <div class="q" data-level="medium" data-answer="2">
+    <p>When other institutional teachers discouraged her, which master percussionist recognized her potential and guided her forward?</p>
+    <ul><li>James Blades</li><li>Ron Forbes</li><li>Ali Bux</li><li>Bismillah Khan</li></ul>
   </div>
+
+  <div class="q" data-level="medium" data-answer="3">
+    <p>In which year was the legendary wind instrument maestro officially awarded India's highest civilian honor, the Bharat Ratna?</p>
+    <ul><li>1999</li><li>2000</li><li>2001</li><li>2005</li></ul>
+  </div>
+
+  <div class="q" data-level="medium" data-answer="2">
+    <p>Who was responsible for refining the structure of the Pungi to transform it into the sweet-sounding Shehnai?</p>
+    <ul><li>A senior royal court musician</li><li>A professional barber belonging to a family of musicians</li><li>The ruler's prime minister</li><li>The emperor himself</li></ul>
+  </div>
+
+  <div class="q" data-level="medium" data-answer="2">
+    <p>When the automated machine flashed to start the day's session, which specific arithmetic lesson was displayed on the screen?</p>
+    <ul><li>Multiplications of decimal figures</li><li>Addition of proper fractions</li><li>Subtraction of positive integers</li><li>Division parameters of rational terms</li></ul>
+  </div>
+
 
   <!-- ---------- HARD ---------- -->
   <div class="q" data-level="hard" data-answer="3">
-    <p>JavaScript me <code>typeof null</code> ka result kya aata hai?</p>
-    <ul><li>"null"</li><li>"undefined"</li><li>"object"</li><li>"number"</li></ul>
+    <p><b>Assertion (A):</b> The deaf musician always removes her footwear before stepping onto elevated wooden performance stages.<br><b>Reason (R):</b> She feels extremely exhausted and prefers to perform in a completely comfortable posture.</p>
+    <ul><li>Both A and R are true, and R is the correct explanation of A.</li><li>Both A and R are true, but R is not the correct explanation of A.</li><li>A is true, but R is false.</li><li>A is false, but R is true.</li></ul>
   </div>
 
-  <div class="q" data-level="hard" data-answer="2">
-    <p>Binary search ki time complexity kya hoti hai (sorted array par)?</p>
-    <ul><li>O(n)</li><li>O(log n)</li><li>O(n log n)</li><li>O(1)</li></ul>
+  <div class="q" data-level="hard" data-answer="1">
+    <p><b>Assertion (A):</b> The maestro flatly rejected a highly lucrative offer to head a specialized training school in the United States.<br><b>Reason (R):</b> He was deeply attached to his motherland, the heritage city of Benaras, and the banks of the holy river Ganga.</p>
+    <ul><li>Both A and R are true, and R is the correct explanation of A.</li><li>Both A and R are true, but R is not the correct explanation of A.</li><li>A is true, but R is false.</li><li>A is false, but R is true.</li></ul>
   </div>
 
-  <div class="q" data-level="hard" data-answer="4">
-    <p>CSS me kaun sa <code>position</code> value element ko normal flow se hata kar nearest positioned ancestor ke hisab se place karta hai?</p>
-    <ul><li>static</li><li>relative</li><li>sticky</li><li>absolute</li></ul>
+  <div class="q" data-level="hard" data-answer="1">
+    <p><b>Assertion (A):</b> The older boy's automated mechanical teacher once had to be completely uninstalled and taken away for nearly a month.<br><b>Reason (R):</b> The entire history sector of his mechanical machine had blanked out completely due to a systemic software error.</p>
+    <ul><li>Both A and R are true, and R is the correct explanation of A.</li><li>Both A and R are true, but R is not the correct explanation of A.</li><li>A is true, but R is false.</li><li>A is false, but R is true.</li></ul>
   </div>
 
 </section>
@@ -239,6 +279,7 @@ const bank = [...document.querySelectorAll('#bank .q')].map(el => ({
 }));
 
 const $ = id => document.getElementById(id);
+$('yr').textContent = new Date().getFullYear();
 const LETTERS = 'ABCDEF';
 let quiz = [], idx = 0, status = [], picked = [], timeLeft = 0, timerId = null;
 
@@ -281,7 +322,10 @@ $('startBtn').onclick = () => {
   if (!m || m <= 0) return $('setupMsg').textContent = 'Time sahi daalo.';
   $('setupMsg').textContent = '';
 
-  quiz = shuffle(pool).slice(0, n);
+  quiz = shuffle(pool).slice(0, n).map(b => {
+    const order = shuffle(b.opts.map((_, i) => i));
+    return { level: b.level, q: b.q, opts: order.map(i => b.opts[i]), ans: order.indexOf(b.ans) };
+  });
   status = quiz.map(() => 'none');
   picked = quiz.map(() => null);
   idx = 0;
@@ -426,3 +470,4 @@ $('againBtn').onclick = () => {
 </script>
 </body>
 </html>
+
