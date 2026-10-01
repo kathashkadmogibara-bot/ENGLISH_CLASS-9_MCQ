@@ -76,6 +76,38 @@ button{font:inherit;cursor:pointer}
 .pick{color:var(--red)} .right{color:var(--green)}
 .perfect{text-align:center;color:var(--green);font-weight:700;padding:20px}
 
+
+/* Topic picker */
+.setup{max-width:780px !important;margin:30px auto !important}
+.seg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+
+.seg button{padding:14px 10px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-weight:700}
+.seg button:hover{border-color:var(--accent)}
+.seg button.on{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.treebar{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
+.treebar .btn{padding:6px 12px;font-size:13px}
+.tree{display:grid;gap:14px;margin-bottom:16px}
+.sect-title{font-size:15px;font-weight:800;margin:6px 0 -4px;letter-spacing:.3px}
+.grp{border:1px solid var(--border);border-radius:14px;padding:12px;background:var(--bg)}
+.grp .grp{margin:0;background:var(--card)}
+.kids{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.kids > .grp{flex:1 1 100%}
+.chip,.ghead{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-weight:600;font-size:14px;text-align:left}
+.grp .grp .chip,.grp .grp .ghead{background:var(--bg)}
+.ghead{font-weight:800;font-size:15px}
+.arrow{width:16px;text-align:center;font-size:13px;flex:none}
+.ghead.open{border-color:var(--accent)}
+.ghead.all{background:color-mix(in srgb,var(--accent) 16%,var(--card))}
+.chip.selall{border-style:dashed}
+.tick{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--muted);display:grid;place-items:center;font-size:12px;line-height:1;flex:none}
+.chip:hover:not(:disabled),.ghead:hover:not(:disabled){border-color:var(--accent)}
+.chip.on,.ghead.on{background:var(--accent) !important;border-color:var(--accent);color:var(--accent-text)}
+.chip.on .tick,.ghead.on .tick{border-color:var(--accent-text)}
+.ghead.part{border-color:var(--accent)}
+.chip small,.ghead small{opacity:.65;font-weight:600}
+.chip:disabled,.ghead:disabled{opacity:.4;cursor:not-allowed}
+.topic{color:var(--muted);font-size:13px;margin-left:8px}
+
 /* Footer */
 footer{text-align:center;color:var(--muted);font-size:14px;padding:24px 16px 32px}
 footer b{color:var(--text);letter-spacing:.5px}
@@ -96,8 +128,27 @@ footer b{color:var(--text);letter-spacing:.5px}
   <!-- ============ SETUP ============ -->
   <div id="setupZone" class="card setup">
     <h2>Test Setup</h2>
+
     <div class="field">
-      <label>Difficulty</label>
+      <label>1. Choose section (you can pick both)</label>
+      <div class="seg" id="modeSeg">
+        <button type="button" data-mode="text">📖 Text</button>
+        <button type="button" data-mode="grammar">✏️ Grammar</button>
+      </div>
+    </div>
+
+    <div class="field" id="topicField">
+      <label>2. Open a button and tick the chapters / topics</label>
+      <div class="hint" id="topicHelp">Pick a section above to see its chapters and topics.</div>
+      <div class="treebar hidden" id="treeBar">
+        <button type="button" class="btn" id="selAllBtn">Select all</button>
+        <button type="button" class="btn" id="clearBtn">Clear</button>
+      </div>
+      <div class="tree" id="tree"></div>
+    </div>
+
+    <div class="field">
+      <label>3. Difficulty</label>
       <select id="levelSel">
         <option value="all">All (Mix)</option>
         <option value="easy">Easy</option>
@@ -122,7 +173,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   <div id="quizZone" class="quiz hidden">
     <div class="card">
       <div class="topbar">
-        <div><span class="qno" id="qNo"></span><span class="tag" id="qTag"></span></div>
+        <div><span class="qno" id="qNo"></span><span class="tag" id="qTag"></span><span class="topic" id="qTopic"></span></div>
         <div class="timer" id="timer">00:00</div>
       </div>
       <div class="qtext" id="qText"></div>
@@ -171,7 +222,7 @@ footer b{color:var(--text);letter-spacing:.5px}
 
      Format of one MCQ - just copy this block and paste it below:
 
-     <div class="q" data-level="easy" data-answer="2">
+     <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
        <p>Write your question here?</p>
        <ul>
          <li>Option 1</li>
@@ -183,13 +234,44 @@ footer b{color:var(--text);letter-spacing:.5px}
 
      data-level  = easy  or  medium  or  hard
      data-answer = number of the correct option (1, 2, 3 or 4)
+     data-topic  = which chapter / grammar topic the question belongs to (see list below).
+                   A question can have more than one topic, separated by a space,
+                   e.g.  data-topic="vc-ap vc-interrogative"
+                   A question WITHOUT data-topic never appears in a topic test.
      You can have anywhere from 2 to 6 options.
+
+     ---------------- TOPIC IDs (data-topic) ----------------
+     TEXT > BEEHIVE (prose)
+       bh-fun The Fun They Had            bh-sound The Sound of Music
+       bh-girl The Little Girl            bh-mind A Truly Beautiful Mind
+       bh-snake The Snake and the Mirror  bh-childhood My Childhood
+       bh-reach Reach for the Top         bh-kathmandu Kathmandu
+       bh-iwereyou If I Were You
+     TEXT > BEEHIVE (poems)
+       bh-road The Road Not Taken         bh-wind Wind
+       bh-rain Rain on the Roof           bh-innisfree The Lake Isle of Innisfree
+       bh-legend A Legend of the Northland  bh-nomen No Men Are Foreign
+       bh-tree On Killing a Tree          bh-slumber A Slumber Did My Spirit Seal
+     TEXT > MOMENTS
+       mo-lostchild The Lost Child        mo-toto The Adventures of Toto
+       mo-iswaran Iswaran the Storyteller mo-kingdom In the Kingdom of Fools
+       mo-prince The Happy Prince         mo-lastleaf The Last Leaf
+       mo-house A House Is Not a Home     mo-beggar The Beggar
+     GRAMMAR > TENSES
+       tn-pres-simple tn-pres-cont tn-pres-perf tn-pres-perfcont
+       tn-past-simple tn-past-cont tn-past-perf tn-past-perfcont
+       tn-fut-simple  tn-fut-cont  tn-fut-perf  tn-fut-perfcont
+     GRAMMAR > VOICE
+       vc-ap Active to Passive   vc-pa Passive to Active
+       vc-assertive  vc-interrogative  vc-exclamatory  vc-imperative
+     GRAMMAR > OTHER
+       gr-determiners  gr-prepositions  gr-modals  gr-qtags  gr-reported  gr-sva
      ===================================================================== -->
 <section id="bank">
 
   <!-- ---------- EASY ---------- -->
 
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
   <p>Tommy found a real book in the attic of his house. How did Margie describe its pages?</p>
   <ul>
     <li>Shiny and green</li>
@@ -199,7 +281,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
   <p>In "The Fun They Had", how old was Tommy?</p>
   <ul>
     <li>Eleven years old</li>
@@ -210,7 +292,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </div>
 
   
-  <div class="q" data-level="easy" data-answer="1">
+  <div class="q" data-level="easy" data-answer="1" data-topic="bh-fun">
   <p>In the story "The Fun They Had", Margie wrote her diary entry on which date?</p>
   <ul>
     <li>17 May 2157</li>
@@ -220,7 +302,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
   <p>How old was Margie when she read the real book found by Tommy?</p>
   <ul>
     <li>13 years old</li>
@@ -230,7 +312,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="3">
+  <div class="q" data-level="easy" data-answer="3" data-topic="bh-fun">
   <p>What was the subject in which Margie was failing repeatedly before the County Inspector fixed the teacher?</p>
   <ul>
     <li>History</li>
@@ -240,7 +322,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
   <p>Where was Margie's schoolroom located in the story?</p>
   <ul>
     <li>In a public school building down the street</li>
@@ -250,7 +332,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
   <p>What was special about the words in the old printed book found by Tommy?</p>
   <ul>
     <li>They kept moving on a screen</li>
@@ -260,7 +342,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-sound">
   <p>At what age was Evelyn Glennie's hearing loss first noticed by her mother?</p>
   <ul>
     <li>Eleven</li>
@@ -270,7 +352,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="3">
+  <div class="q" data-level="easy" data-answer="3" data-topic="bh-sound">
   <p>Which musical instrument did Evelyn Glennie famously manage to master to perform globally?</p>
   <ul>
     <li>Violin</li>
@@ -280,7 +362,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-sound">
   <p>Emperor Aurangzeb banned the playing of which musical instrument in the royal residence?</p>
   <ul>
     <li>Shehnai</li>
@@ -290,7 +372,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="3">
+  <div class="q" data-level="easy" data-answer="3" data-topic="bh-girl">
   <p>In the chapter "The Little Girl", Kezia stuttered and stammered only when talking to whom?</p>
   <ul>
     <li>Her grandfather</li>
@@ -300,7 +382,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-girl">
   <p>Who was the friendly neighbor family Kezia watched playing happily in their lawn?</p>
   <ul>
     <li>The Smiths</li>
@@ -310,7 +392,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-mind">
   <p>Where did Albert Einstein find a job as a technical expert in the year 1902?</p>
   <ul>
     <li>Zurich University</li>
@@ -320,7 +402,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="1">
+  <div class="q" data-level="easy" data-answer="1" data-topic="bh-mind">
   <p>In which year did Albert Einstein publish his famous Special Theory of Relativity?</p>
   <ul>
     <li>1905</li>
@@ -330,7 +412,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-wind">
   <p>According to Subramania Bharati's poem "Wind", what does the wind do to weak fires?</p>
   <ul>
     <li>It makes them grow stronger</li>
@@ -340,7 +422,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-rain">
   <p>Who wrote the poem "Rain on the Roof"?</p>
   <ul>
     <li>Robert Frost</li>
@@ -350,7 +432,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="3">
+  <div class="q" data-level="easy" data-answer="3" data-topic="mo-lostchild">
   <p>In "The Lost Child", what was the very first item that attracted the child when he entered the fair?</p>
   <ul>
     <li>Burfi from the sweetmeat shop</li>
@@ -360,7 +442,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="3">
+  <div class="q" data-level="easy" data-answer="3" data-topic="mo-lostchild">
   <p>What sweetmeat did the lost child secretly long for at the fair entrance?</p>
   <ul>
     <li>Gulab Jamun</li>
@@ -370,7 +452,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="mo-lostchild">
   <p>Who rescued the crying child from the heavy, crushing crowd at the temple shrine?</p>
   <ul>
     <li>A local police inspector</li>
@@ -380,7 +462,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="mo-toto">
   <p>In "The Adventures of Toto", how much did Grandfather pay to buy the monkey from the tonga-driver?</p>
   <ul>
     <li>Ten rupees</li>
@@ -390,7 +472,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="mo-toto">
   <p>Whose school blazer did Toto tear into shreds in the bedroom?</p>
   <ul>
     <li>Grandfather's morning coat</li>
@@ -400,7 +482,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="tn-pres-simple">
   <p>Choose the correct form: "Water ________ at 100 degrees Celsius."</p>
   <ul>
     <li>is boiling</li>
@@ -410,7 +492,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="gr-prepositions">
   <p>Fill in the blank with the correct preposition: He is proficient ________ mathematics.</p>
   <ul>
     <li>at</li>
@@ -420,7 +502,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="gr-prepositions">
   <p>The cat jumped ________ the table to catch the mouse.</p>
   <ul>
     <li>in</li>
@@ -430,7 +512,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="gr-prepositions">
   <p>Choose the correct preposition: She has been suffering ________ fever for two days.</p>
   <ul>
     <li>with</li>
@@ -440,7 +522,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="mo-toto">
   <p>What is the synonym of the word "Mischievous" as used to describe Toto?</p>
   <ul>
     <li>Obedient</li>
@@ -450,32 +532,32 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
     <p>What was the exact headline date recorded at the top of the diary entry?</p>
     <ul><li>15 March 2157</li><li>17 May 2157</li><li>17 May 2057</li><li>12 April 2155</li></ul>
   </div>
 
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
     <p>What is the exact age of the young girl who kept the diary?</p>
     <ul><li>Nine years old</li><li>Eleven years old</li><li>Thirteen years old</li><li>Fifteen years old</li></ul>
   </div>
 
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-fun">
     <p>What strange object did the older boy find in the attic of his house?</p>
     <ul><li>A functional mechanical teacher</li><li>A real book with yellow, crinkly pages</li><li>An antique tele-screen console</li><li>A punch code notebook</li></ul>
   </div>
 
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="bh-sound">
     <p>At what age was the young girl's hearing impairment first noticed by her mother?</p>
     <ul><li>Five years old</li><li>Subjectively at eight years old</li><li>Eleven years old</li><li>Sixteen years old</li></ul>
   </div>
 
-  <div class="q" data-level="easy" data-answer="3">
+  <div class="q" data-level="easy" data-answer="3" data-topic="bh-sound">
     <p>Which historical ruler ordered a complete ban on playing the musical instrument named 'Pungi' in the royal residence?</p>
     <ul><li>Emperor Akbar</li><li>Emperor Shah Jahan</li><li>Emperor Aurangzeb</li><li>Emperor Babur</li></ul>
   </div>
 
-  <div class="q" data-level="easy" data-answer="2">
+  <div class="q" data-level="easy" data-answer="2" data-topic="mo-toto">
     <p>For what exact sum of money did Grandfather purchase the mischievous pet monkey from the local driver?</p>
     <ul><li>Three rupees</li><li>Five rupees</li><li>Seven rupees</li><li>Ten rupees</li></ul>
   </div>
@@ -483,7 +565,7 @@ footer b{color:var(--text);letter-spacing:.5px}
 
   <!-- ---------- MEDIUM ---------- -->
 
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-sound">
   <p>Evelyn Glennie's profound hearing loss was officially confirmed by a specialist doctor at the age of:</p>
   <ul>
     <li>Eight</li>
@@ -493,7 +575,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="1">
+  <div class="q" data-level="medium" data-answer="1" data-topic="bh-sound">
   <p>Where did young Bismillah Khan practice his music in complete solitude during his childhood?</p>
   <ul>
     <li>On the banks of the River Ganga</li>
@@ -513,7 +595,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="mo-toto">
   <p>During the train journey to Saharanpur, how did Toto manage to surprise the ticket collector?</p>
   <ul>
     <li>He made a loud noise from inside the canvas bag</li>
@@ -523,7 +605,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="gr-qtags">
   <p>Choose the correct tag for: "You are coming to school tomorrow, ______?"</p>
   <ul>
     <li>are you</li>
@@ -533,7 +615,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="1">
+  <div class="q" data-level="medium" data-answer="1" data-topic="gr-determiners">
   <p>Choose the correct determiner: ________ of the two options is correct.</p>
   <ul>
     <li>Neither</li>
@@ -544,7 +626,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </div>
   
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-fun">
   <p>To what age level did the County Inspector adjust Margie's mechanical teacher's geography sector?</p>
   <ul>
     <li>Average 12-year level</li>
@@ -554,7 +636,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-sound">
   <p>Who was the master percussionist that spotted Evelyn's talent and advised her to feel music instead of listening to it?</p>
   <ul>
     <li>Ustad Bismillah Khan</li>
@@ -564,7 +646,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-sound">
   <p>The shehnai was traditionally played as part of the 'naubat', which means a collection of how many traditional instruments?</p>
   <ul>
     <li>Five</li>
@@ -574,7 +656,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="3">
+  <div class="q" data-level="medium" data-answer="3" data-topic="bh-girl">
   <p>What did Kezia use to stuff the pin-cushion she was making for her father's birthday?</p>
   <ul>
     <li>Cotton wool from the medicine cabinet</li>
@@ -584,7 +666,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-mind">
   <p>In "A Truly Beautiful Mind", what nickname did Albert Einstein's childhood playmates give him?</p>
   <ul>
     <li>The Professor</li>
@@ -594,7 +676,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-mind">
   <p>What world event in 1945 deeply distressed Einstein, leading him to propose a world government to the UN?</p>
   <ul>
     <li>The start of World War I</li>
@@ -604,7 +686,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-road">
   <p>In the poem "The Road Not Taken", what does the phrase "yellow wood" represent?</p>
   <ul>
     <li>A forest blooming with yellow flowers in spring</li>
@@ -614,7 +696,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-road">
   <p>Why did the traveler choose the second road in Robert Frost's poem?</p>
   <ul>
     <li>It was shorter and smoother</li>
@@ -624,7 +706,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-wind">
   <p>What does the poet ask us to do to make friendship with the destructive wind?</p>
   <ul>
     <li>Cry and pray to the wind god</li>
@@ -634,7 +716,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="1">
+  <div class="q" data-level="medium" data-answer="1" data-topic="bh-rain">
   <p>In "Rain on the Roof", what does the patter of rain bring back to the poet's mind?</p>
   <ul>
     <li>Memories of his childhood and his mother</li>
@@ -644,7 +726,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-wind">
   <p>What is the central message of the poem "Wind"?</p>
   <ul>
     <li>Wind is a beautiful element of nature</li>
@@ -654,7 +736,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="mo-lostchild">
   <p>At what point did the child realize that he had been separated from his parents?</p>
   <ul>
     <li>When he stopped to look at the snake charmer</li>
@@ -664,7 +746,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="mo-toto">
   <p>Where was Toto kept hidden initially to keep his arrival a secret from Grandmother?</p>
   <ul>
     <li>In a large cage in the stable</li>
@@ -674,7 +756,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="mo-toto">
   <p>What mischief did Toto do with Grandfather's pet tortoise during the journey to Saharanpur?</p>
   <ul>
     <li>He threw it out of the train window</li>
@@ -684,7 +766,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="mo-toto">
   <p>What did Toto do when he was given a large bowl of warm water for a bath in winter?</p>
   <ul>
     <li>He drank the water completely</li>
@@ -694,7 +776,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="3">
+  <div class="q" data-level="medium" data-answer="3" data-topic="tn-past-perf">
   <p>Fill in the blank: By the time we reached the station, the train ________.</p>
   <ul>
     <li>left</li>
@@ -704,7 +786,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="tn-pres-perfcont">
   <p>Identify the correct tense form: "She ________ this novel since morning."</p>
   <ul>
     <li>is reading</li>
@@ -714,7 +796,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="gr-determiners">
   <p>Fill in the blank with an appropriate determiner: There is ________ milk left in the jug, so you cannot make tea.</p>
   <ul>
     <li>much</li>
@@ -724,7 +806,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="1">
+  <div class="q" data-level="medium" data-answer="1" data-topic="gr-determiners">
   <p>Choose the correct determiner: ________ of the two books contains the required formulas.</p>
   <ul>
     <li>Each</li>
@@ -734,7 +816,7 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="3">
+  <div class="q" data-level="medium" data-answer="3" data-topic="bh-wind">
   <p>What is the antonym of the word "Steadfast" from the poem Wind?</p>
   <ul>
     <li>Firm</li>
@@ -744,32 +826,32 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-fun">
     <p>Which specific subject sector of the mechanical teacher had developed an operational velocity fault, causing repeated failures?</p>
     <ul><li>History sector</li><li>Geography sector</li><li>Mathematics track</li><li>General Science sector</li></ul>
   </div>
 
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-sound">
     <p>At what age was the girl's absolute hearing loss officially confirmed by a qualified specialist?</p>
     <ul><li>8 years old</li><li>11 years old</li><li>15 years old</li><li>17 years old</li></ul>
   </div>
 
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-sound">
     <p>When other institutional teachers discouraged her, which master percussionist recognized her potential and guided her forward?</p>
     <ul><li>James Blades</li><li>Ron Forbes</li><li>Ali Bux</li><li>Bismillah Khan</li></ul>
   </div>
 
-  <div class="q" data-level="medium" data-answer="3">
+  <div class="q" data-level="medium" data-answer="3" data-topic="bh-sound">
     <p>In which year was the legendary wind instrument maestro officially awarded India's highest civilian honor, the Bharat Ratna?</p>
     <ul><li>1999</li><li>2000</li><li>2001</li><li>2005</li></ul>
   </div>
 
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-sound">
     <p>Who was responsible for refining the structure of the Pungi to transform it into the sweet-sounding Shehnai?</p>
     <ul><li>A senior royal court musician</li><li>A professional barber belonging to a family of musicians</li><li>The ruler's prime minister</li><li>The emperor himself</li></ul>
   </div>
 
-  <div class="q" data-level="medium" data-answer="2">
+  <div class="q" data-level="medium" data-answer="2" data-topic="bh-fun">
     <p>When the automated machine flashed to start the day's session, which specific arithmetic lesson was displayed on the screen?</p>
     <ul><li>Multiplications of decimal figures</li><li>Addition of proper fractions</li><li>Subtraction of positive integers</li><li>Division parameters of rational terms</li></ul>
   </div>
@@ -777,7 +859,7 @@ footer b{color:var(--text);letter-spacing:.5px}
 
   <!-- ---------- HARD ---------- -->
   
-  <div class="q" data-level="hard" data-answer="2">
+  <div class="q" data-level="hard" data-answer="2" data-topic="mo-toto">
   <p>Why did Grandfather ultimately decide to sell Toto back to the tonga-driver?</p>
   <ul>
     <li>Toto bit the neighborhood dogs</li>
@@ -787,19 +869,126 @@ footer b{color:var(--text);letter-spacing:.5px}
   </ul>
   </div>
   
-  <div class="q" data-level="hard" data-answer="3">
+  <div class="q" data-level="hard" data-answer="3" data-topic="bh-sound">
     <p><b>Assertion (A):</b> The deaf musician always removes her footwear before stepping onto elevated wooden performance stages.<br><b>Reason (R):</b> She feels extremely exhausted and prefers to perform in a completely comfortable posture.</p>
     <ul><li>Both A and R are true, and R is the correct explanation of A.</li><li>Both A and R are true, but R is not the correct explanation of A.</li><li>A is true, but R is false.</li><li>A is false, but R is true.</li></ul>
   </div>
 
-  <div class="q" data-level="hard" data-answer="1">
+  <div class="q" data-level="hard" data-answer="1" data-topic="bh-sound">
     <p><b>Assertion (A):</b> The maestro flatly rejected a highly lucrative offer to head a specialized training school in the United States.<br><b>Reason (R):</b> He was deeply attached to his motherland, the heritage city of Benaras, and the banks of the holy river Ganga.</p>
     <ul><li>Both A and R are true, and R is the correct explanation of A.</li><li>Both A and R are true, but R is not the correct explanation of A.</li><li>A is true, but R is false.</li><li>A is false, but R is true.</li></ul>
   </div>
 
-  <div class="q" data-level="hard" data-answer="1">
+  <div class="q" data-level="hard" data-answer="1" data-topic="bh-fun">
     <p><b>Assertion (A):</b> The older boy's automated mechanical teacher once had to be completely uninstalled and taken away for nearly a month.<br><b>Reason (R):</b> The entire history sector of his mechanical machine had blanked out completely due to a systemic software error.</p>
     <ul><li>Both A and R are true, and R is the correct explanation of A.</li><li>Both A and R are true, but R is not the correct explanation of A.</li><li>A is true, but R is false.</li><li>A is false, but R is true.</li></ul>
+  </div>
+
+
+  <!-- ---------- GRAMMAR : TENSES ---------- -->
+  <div class="q" data-level="easy" data-answer="2" data-topic="tn-pres-cont">
+    <p>Choose the correct form: "Listen! The baby ________ in the next room."</p>
+    <ul><li>cries</li><li>is crying</li><li>cried</li><li>has cried</li></ul>
+  </div>
+  
+  <div class="q" data-level="easy" data-answer="3" data-topic="tn-pres-perf">
+    <p>I ________ my homework, so I can play now.</p>
+    <ul><li>finish</li><li>am finishing</li><li>have finished</li><li>will finish</li></ul>
+  </div>
+  
+  <div class="q" data-level="easy" data-answer="2" data-topic="tn-past-simple">
+    <p>Yesterday, we ________ a movie at the theatre.</p>
+    <ul><li>see</li><li>saw</li><li>have seen</li><li>are seeing</li></ul>
+  </div>
+  
+  <div class="q" data-level="medium" data-answer="2" data-topic="tn-past-cont">
+    <p>When the phone rang, she ________ dinner.</p>
+    <ul><li>cooked</li><li>was cooking</li><li>has cooked</li><li>is cooking</li></ul>
+  </div>
+  
+  <div class="q" data-level="hard" data-answer="2" data-topic="tn-past-perfcont">
+    <p>They ________ for two hours when the rain started.</p>
+    <ul><li>have been waiting</li><li>had been waiting</li><li>waited</li><li>will have been waiting</li></ul>
+  </div>
+  
+  <div class="q" data-level="easy" data-answer="2" data-topic="tn-fut-simple">
+    <p>I think it ________ tomorrow.</p>
+    <ul><li>rains</li><li>will rain</li><li>rained</li><li>has rained</li></ul>
+  </div>
+  
+  <div class="q" data-level="medium" data-answer="2" data-topic="tn-fut-cont">
+    <p>This time next week, she ________ on a beach in Goa.</p>
+    <ul><li>lies</li><li>will be lying</li><li>has lain</li><li>lay</li></ul>
+  </div>
+  
+  <div class="q" data-level="medium" data-answer="3" data-topic="tn-fut-perf">
+    <p>By the end of this year, he ________ his studies.</p>
+    <ul><li>completed</li><li>has completed</li><li>will have completed</li><li>is completing</li></ul>
+  </div>
+  
+  <div class="q" data-level="hard" data-answer="2" data-topic="tn-fut-perfcont">
+    <p>By next June, she ________ in this school for ten years.</p>
+    <ul><li>will teach</li><li>will have been teaching</li><li>has taught</li><li>is teaching</li></ul>
+  </div>
+
+  <!-- ---------- GRAMMAR : VOICE ---------- -->
+  <div class="q" data-level="easy" data-answer="1" data-topic="vc-ap vc-assertive">
+    <p>Change into passive voice: "The teacher praised the students."</p>
+    <ul><li>The students were praised by the teacher.</li><li>The students are praised by the teacher.</li><li>The students was praised by the teacher.</li><li>The teacher was praised by the students.</li></ul>
+  </div>
+  <div class="q" data-level="medium" data-answer="2" data-topic="vc-ap vc-interrogative">
+    <p>Change into passive voice: "Who wrote this letter?"</p>
+    <ul><li>By whom this letter was written?</li><li>By whom was this letter written?</li><li>Who is this letter written by?</li><li>Whom was this letter written?</li></ul>
+  </div>
+  <div class="q" data-level="medium" data-answer="1" data-topic="vc-ap vc-imperative">
+    <p>Change into passive voice: "Open the door."</p>
+    <ul><li>Let the door be opened.</li><li>Let the door is opened.</li><li>The door was opened.</li><li>The door has been opened.</li></ul>
+  </div>
+  <div class="q" data-level="easy" data-answer="2" data-topic="vc-pa vc-assertive">
+    <p>Change into active voice: "The window was broken by the boy."</p>
+    <ul><li>The boy has broken the window.</li><li>The boy broke the window.</li><li>The boy breaks the window.</li><li>The boy was breaking the window.</li></ul>
+  </div>
+  <div class="q" data-level="medium" data-answer="3" data-topic="vc-pa vc-interrogative">
+    <p>Change into active voice: "Was the song sung by her?"</p>
+    <ul><li>Does she sing the song?</li><li>Was she singing the song?</li><li>Did she sing the song?</li><li>Did she sung the song?</li></ul>
+  </div>
+  <div class="q" data-level="hard" data-answer="4" data-topic="vc-ap vc-exclamatory">
+    <p>Change into passive voice: "What a beautiful painting she has made!"</p>
+    <ul><li>What a beautiful painting is made by her!</li><li>What a beautiful painting had been made by her!</li><li>How a beautiful painting has been made by her!</li><li>What a beautiful painting has been made by her!</li></ul>
+  </div>
+  <div class="q" data-level="medium" data-answer="1" data-topic="vc-pa vc-imperative">
+    <p>Change into active voice: "Let the work be done at once."</p>
+    <ul><li>Do the work at once.</li><li>Let him do the work at once.</li><li>The work should do at once.</li><li>Done the work at once.</li></ul>
+  </div>
+  <div class="q" data-level="hard" data-answer="3" data-topic="vc-ap vc-assertive">
+    <p>Change into passive voice: "She can solve this problem."</p>
+    <ul><li>This problem is solved by her.</li><li>This problem could be solved by her.</li><li>This problem can be solved by her.</li><li>This problem can solve by her.</li></ul>
+  </div>
+
+  <!-- ---------- GRAMMAR : MODALS / REPORTED SPEECH / SUBJECT-VERB AGREEMENT ---------- -->
+  <div class="q" data-level="easy" data-answer="2" data-topic="gr-modals">
+    <p>She ________ swim when she was five years old.</p>
+    <ul><li>can</li><li>could</li><li>may</li><li>shall</li></ul>
+  </div>
+  <div class="q" data-level="medium" data-answer="1" data-topic="gr-modals">
+    <p>________ I borrow your pen, please?</p>
+    <ul><li>May</li><li>Must</li><li>Ought</li><li>Need</li></ul>
+  </div>
+  <div class="q" data-level="medium" data-answer="1" data-topic="gr-reported">
+    <p>Change into reported speech: He said, "I am busy."</p>
+    <ul><li>He said that he was busy.</li><li>He said that I was busy.</li><li>He said that he had been busy.</li><li>He said that he will be busy.</li></ul>
+  </div>
+  <div class="q" data-level="hard" data-answer="2" data-topic="gr-reported">
+    <p>Change into reported speech: She asked, "Where do you live?"</p>
+    <ul><li>She asked where do I live.</li><li>She asked where I lived.</li><li>She asked that where I lived.</li><li>She asked where I live?</li></ul>
+  </div>
+  <div class="q" data-level="easy" data-answer="3" data-topic="gr-sva">
+    <p>Each of the students ________ present today.</p>
+    <ul><li>are</li><li>were</li><li>is</li><li>have been</li></ul>
+  </div>
+  <div class="q" data-level="medium" data-answer="2" data-topic="gr-sva">
+    <p>The news ________ true.</p>
+    <ul><li>are</li><li>is</li><li>were</li><li>have been</li></ul>
   </div>
 
 </section>
@@ -809,6 +998,7 @@ footer b{color:var(--text);letter-spacing:.5px}
 const bank = [...document.querySelectorAll('#bank .q')].map(el => ({
   level: (el.dataset.level || 'easy').toLowerCase().trim(),
   q: el.querySelector('p').innerHTML,
+  topics: (el.dataset.topic || '').split(/\s+/).filter(Boolean),
   opts: [...el.querySelectorAll('li')].map(li => li.innerHTML),
   ans: parseInt(el.dataset.answer, 10) - 1
 }));
@@ -824,19 +1014,202 @@ $('themeBtn').onclick = () => {
   $('themeBtn').textContent = document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
 };
 
+/* ---------- Topic tree (edit here to add chapters / topics) ---------- */
+const TOPICS = {
+  text: { label: '📖 Text', groups: [
+    { label: 'Beehive', children: [
+      { label: 'Prose', children: [
+        { id: 'bh-fun',       label: 'The Fun They Had' },
+        { id: 'bh-sound',     label: 'The Sound of Music' },
+        { id: 'bh-girl',      label: 'The Little Girl' },
+        { id: 'bh-mind',      label: 'A Truly Beautiful Mind' },
+        { id: 'bh-snake',     label: 'The Snake and the Mirror' },
+        { id: 'bh-childhood', label: 'My Childhood' },
+        { id: 'bh-reach',     label: 'Reach for the Top' },
+        { id: 'bh-kathmandu', label: 'Kathmandu' },
+        { id: 'bh-iwereyou',  label: 'If I Were You' }
+      ]},
+      { label: 'Poems', children: [
+        { id: 'bh-road',      label: 'The Road Not Taken' },
+        { id: 'bh-wind',      label: 'Wind' },
+        { id: 'bh-rain',      label: 'Rain on the Roof' },
+        { id: 'bh-innisfree', label: 'The Lake Isle of Innisfree' },
+        { id: 'bh-legend',    label: 'A Legend of the Northland' },
+        { id: 'bh-nomen',     label: 'No Men Are Foreign' },
+        { id: 'bh-tree',      label: 'On Killing a Tree' },
+        { id: 'bh-slumber',   label: 'A Slumber Did My Spirit Seal' }
+      ]}
+    ]},
+    { label: 'Moments', children: [
+      { id: 'mo-lostchild', label: 'The Lost Child' },
+      { id: 'mo-toto',      label: 'The Adventures of Toto' },
+      { id: 'mo-iswaran',   label: 'Iswaran the Storyteller' },
+      { id: 'mo-kingdom',   label: 'In the Kingdom of Fools' },
+      { id: 'mo-prince',    label: 'The Happy Prince' },
+      { id: 'mo-lastleaf',  label: 'The Last Leaf' },
+      { id: 'mo-house',     label: 'A House Is Not a Home' },
+      { id: 'mo-beggar',    label: 'The Beggar' }
+    ]}
+  ]},
+  grammar: { label: '✏️ Grammar', groups: [
+    { label: 'Tenses', children: [
+      { label: 'Present', children: [
+        { id: 'tn-pres-simple',   label: 'Simple / Indefinite Present' },
+        { id: 'tn-pres-cont',     label: 'Present Continuous' },
+        { id: 'tn-pres-perf',     label: 'Present Perfect' },
+        { id: 'tn-pres-perfcont', label: 'Present Perfect Continuous' }
+      ]},
+      { label: 'Past', children: [
+        { id: 'tn-past-simple',   label: 'Simple / Indefinite Past' },
+        { id: 'tn-past-cont',     label: 'Past Continuous' },
+        { id: 'tn-past-perf',     label: 'Past Perfect' },
+        { id: 'tn-past-perfcont', label: 'Past Perfect Continuous' }
+      ]},
+      { label: 'Future', children: [
+        { id: 'tn-fut-simple',    label: 'Simple / Indefinite Future' },
+        { id: 'tn-fut-cont',      label: 'Future Continuous' },
+        { id: 'tn-fut-perf',      label: 'Future Perfect' },
+        { id: 'tn-fut-perfcont',  label: 'Future Perfect Continuous' }
+      ]}
+    ]},
+    { label: 'Voice', children: [
+      { label: 'Conversion', children: [
+        { id: 'vc-ap', label: 'Active → Passive' },
+        { id: 'vc-pa', label: 'Passive → Active' }
+      ]},
+      { label: 'Type of sentence', children: [
+        { id: 'vc-assertive',     label: 'Assertive' },
+        { id: 'vc-interrogative', label: 'Interrogative' },
+        { id: 'vc-exclamatory',   label: 'Exclamatory' },
+        { id: 'vc-imperative',    label: 'Imperative' }
+      ]}
+    ]},
+    { label: 'Other Grammar', children: [
+      { id: 'gr-determiners',  label: 'Determiners' },
+      { id: 'gr-prepositions', label: 'Prepositions' },
+      { id: 'gr-modals',       label: 'Modals' },
+      { id: 'gr-qtags',        label: 'Question Tags' },
+      { id: 'gr-reported',     label: 'Reported Speech' },
+      { id: 'gr-sva',          label: 'Subject-Verb Agreement' }
+    ]}
+  ]}
+};
+
+const leavesOf = n => n.children ? n.children.flatMap(leavesOf) : [n];
+const LABEL = {};
+Object.values(TOPICS).forEach(sec => sec.groups.forEach(g =>
+  leavesOf(g).forEach(l => { LABEL[l.id] = g.label + ' · ' + l.label; })));
+
+const counts = {};
+bank.forEach(b => b.topics.forEach(t => {
+  counts[t] = (counts[t] || 0) + 1;
+  if (!LABEL[t]) console.warn('Unknown data-topic "' + t + '" in question:', b.q);
+}));
+const untaggedCount = bank.filter(b => !b.topics.length).length;
+if (untaggedCount) console.warn(untaggedCount + ' question(s) have no data-topic and will not appear in any test.');
+
+const active = new Set();        // 'text' and/or 'grammar'
+const open = new Set();          // keys of groups that are opened
+const selected = new Set();      // selected topic ids
+
+const sections = () => ['text', 'grammar'].filter(k => active.has(k)).map(k => TOPICS[k]);
+const visibleLeaves = () => sections().flatMap(sec => sec.groups.flatMap(leavesOf));
+const usable = id => (counts[id] || 0) > 0;
+
+function renderNode(node, key){
+  if (!node.children){
+    const n = counts[node.id] || 0, on = selected.has(node.id);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (on ? ' on' : '');
+    b.disabled = !n;
+    b.title = n ? '' : 'No questions yet for this topic';
+    b.setAttribute('aria-pressed', on);
+    b.innerHTML = `<span class="tick">${on ? '✓' : ''}</span><span>${node.label}</span><small>${n}</small>`;
+    b.onclick = () => { on ? selected.delete(node.id) : selected.add(node.id); refresh(); };
+    return b;
+  }
+  const usableLeaves = leavesOf(node).filter(l => usable(l.id));
+  const onCount = usableLeaves.filter(l => selected.has(l.id)).length;
+  const all = usableLeaves.length > 0 && onCount === usableLeaves.length;
+  const isOpen = open.has(key);
+
+  const box = document.createElement('div');
+  box.className = 'grp';
+  const head = document.createElement('button');
+  head.type = 'button';
+  head.className = 'ghead' + (isOpen ? ' open' : '') + (all ? ' all' : onCount ? ' part' : '');
+  head.disabled = !usableLeaves.length;
+  head.setAttribute('aria-expanded', isOpen);
+  head.innerHTML = `<span class="arrow">${isOpen ? '▾' : '▸'}</span><span>${node.label}</span><small>${onCount}/${usableLeaves.length}</small>`;
+  head.onclick = () => { isOpen ? open.delete(key) : open.add(key); refresh(); };
+  box.appendChild(head);
+
+  if (isOpen){
+    const kids = document.createElement('div');
+    kids.className = 'kids';
+    const sa = document.createElement('button');
+    sa.type = 'button';
+    sa.className = 'chip selall' + (all ? ' on' : '');
+    sa.setAttribute('aria-pressed', all);
+    sa.innerHTML = `<span class="tick">${all ? '✓' : ''}</span><span>Select all</span>`;
+    sa.onclick = () => { usableLeaves.forEach(l => all ? selected.delete(l.id) : selected.add(l.id)); refresh(); };
+    kids.appendChild(sa);
+    node.children.forEach(c => kids.appendChild(renderNode(c, key + '/' + c.label)));
+    box.appendChild(kids);
+  }
+  return box;
+}
+
+function renderTree(){
+  const tree = $('tree');
+  tree.innerHTML = '';
+  $('treeBar').classList.toggle('hidden', !active.size);
+  $('topicHelp').textContent = active.size
+    ? 'Tap a button to open it. Tap a chapter / topic to tick it (it turns blue). Greyed ones have no questions yet.'
+    : 'Pick Text, Grammar or both above.';
+  sections().forEach(sec => {
+    const secKey = sec === TOPICS.text ? 'text' : 'grammar';
+    const t = document.createElement('div');
+    t.className = 'sect-title';
+    t.textContent = sec.label;
+    tree.appendChild(t);
+    sec.groups.forEach(g => tree.appendChild(renderNode(g, secKey + '/' + g.label)));
+  });
+}
+
 /* ---------- Setup ---------- */
 function available(){
   const lv = $('levelSel').value;
-  return bank.filter(b => lv === 'all' || b.level === lv);
+  return bank.filter(b => (lv === 'all' || b.level === lv) && b.topics.some(t => selected.has(t)));
 }
+let numTouched = false;
+$('numQ').addEventListener('input', () => { numTouched = true; });
 function updateHint(){
   const n = available().length;
-  $('availHint').textContent = `${n} questions available in this difficulty.`;
+  $('availHint').textContent = !active.size
+    ? 'Choose Text or Grammar above to begin.'
+    : !selected.size ? 'Tick at least one chapter or topic.'
+    : `${n} question${n === 1 ? ' matches' : 's match'} your selection.`;
   $('numQ').max = n;
-  if (+$('numQ').value > n) $('numQ').value = n || 1;
+  if (!numTouched) $('numQ').value = Math.min(5, n) || 1;
+  else if (+$('numQ').value > n) $('numQ').value = n || 1;
 }
+function refresh(){ $('setupMsg').textContent = ''; renderTree(); updateHint(); }
+
+document.querySelectorAll('#modeSeg button').forEach(btn => btn.onclick = () => {
+  const k = btn.dataset.mode;
+  active.has(k) ? active.delete(k) : active.add(k);
+  btn.classList.toggle('on', active.has(k));
+  btn.setAttribute('aria-pressed', active.has(k));
+  const vis = new Set(visibleLeaves().map(l => l.id));       // drop ticks of a section that was switched off
+  [...selected].forEach(id => { if (!vis.has(id)) selected.delete(id); });
+  refresh();
+});
+$('selAllBtn').onclick = () => { visibleLeaves().filter(l => usable(l.id)).forEach(l => selected.add(l.id)); refresh(); };
+$('clearBtn').onclick = () => { selected.clear(); refresh(); };
 $('levelSel').onchange = updateHint;
-updateHint();
+refresh();
 
 function shuffle(a){
   a = a.slice();
@@ -851,7 +1224,9 @@ $('startBtn').onclick = () => {
   const pool = available();
   const n = parseInt($('numQ').value, 10);
   const m = parseFloat($('mins').value);
-  if (!pool.length) return $('setupMsg').textContent = 'No questions available for this difficulty.';
+  if (!active.size) return $('setupMsg').textContent = 'Please choose Text or Grammar (or both).';
+  if (!selected.size) return $('setupMsg').textContent = 'Please tick at least one chapter or topic.';
+  if (!pool.length) return $('setupMsg').textContent = 'No questions match this selection and difficulty.';
   if (!n || n < 1) return $('setupMsg').textContent = 'Enter a valid number of questions.';
   if (n > pool.length) return $('setupMsg').textContent = `Only ${pool.length} questions are available.`;
   if (!m || m <= 0) return $('setupMsg').textContent = 'Enter a valid time.';
@@ -859,7 +1234,8 @@ $('startBtn').onclick = () => {
 
   quiz = shuffle(pool).slice(0, n).map(b => {
     const order = shuffle(b.opts.map((_, i) => i));
-    return { level: b.level, q: b.q, opts: order.map(i => b.opts[i]), ans: order.indexOf(b.ans) };
+    const t = b.topics.find(x => selected.has(x)) || b.topics[0];
+    return { level: b.level, topic: LABEL[t] || '', q: b.q, opts: order.map(i => b.opts[i]), ans: order.indexOf(b.ans) };
   });
   status = quiz.map(() => 'none');
   picked = quiz.map(() => null);
@@ -893,6 +1269,7 @@ function render(){
   const tag = $('qTag');
   tag.textContent = cur.level;
   tag.className = 'tag ' + cur.level;
+  $('qTopic').textContent = cur.topic || '';
   $('qText').innerHTML = cur.q;
   $('quizMsg').textContent = '';
 
@@ -992,6 +1369,7 @@ function finish(){
     d.className = 'wrong';
     d.innerHTML = `
       <div class="q">Q${i + 1}. ${q.q} <span class="tag ${q.level}" style="margin-left:6px">${q.level}</span></div>
+      ${q.topic ? `<div class="topic" style="margin:-2px 0 8px 0">${q.topic}</div>` : ''}
       <div class="pick">Your answer: ${answered ? LETTERS[picked[i]] + '. ' + q.opts[picked[i]] : 'Not answered'}</div>
       <div class="right">Correct answer: ${LETTERS[q.ans]}. ${q.opts[q.ans]}</div>`;
     list.appendChild(d);
@@ -1005,4 +1383,3 @@ $('againBtn').onclick = () => {
 </script>
 </body>
 </html>
-
